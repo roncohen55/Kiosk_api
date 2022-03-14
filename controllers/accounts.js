@@ -184,6 +184,101 @@ router.get('/sayHello',async (request,response)=>{
     });
 })
 
+//forget password
+router.post('/forgetPassword', async (request,response)=>{
+    const email = request.body.email;
+    User.findOne({ email: email })
+    .then(async account => {
+        if(account){
+            const newpasscode = generateRandomIntegerInRange(1000,9999);
+            account.passcode = newpasscode;
+            account.save()
+            .then(account_updated => {
+                return response.status(200).json({
+                    message:account_updated.passcode
+                })
+            })
+        }
+        else{
+            return response.status(200).json({
+                message: 'User not found'
+             });
+        }
+    })
+    .catch(err =>{
+        return response.status(500).json({
+            message: err
+         });
+    })
+   
+
+});
+
+//verify Newpasscode
+router.post('/verifyNew', async  (request, response)=>{
+    // TODO Get password and email
+    const {email,passcode} = request.body;
+    // TODO Is user exist ? 
+    User.findOne({ email: email })
+    .then (async account => {
+        if (account){
+            // TODO Verify code
+            if (account.passcode == passcode){                    
+                    // TODO Response
+                    return response.status(200).json({
+                        message:'the passcode is match'
+                     });
+              
+            }
+            else{
+                return response.status(200).json({
+                    message: 'PassCode not match'
+                 });
+            }
+        }
+        else{
+            return response.status(200).json({
+                message: 'User not found'
+             });
+        }
+    })
+    .catch(err =>{
+        return response.status(500).json({
+            message: err
+         });
+    })
+
+});
+
+router.post('/newpassword',async (request,response)=>{
+    const {email,password} = request.body;
+    User.findOne({ email: email })
+    .then(async (account)=>{
+        if(account){
+            const formatedPassword = await bcryptjs.hash(password,10);
+            account.password = formatedPassword;
+            account.save()
+            .then(account_updated=>{
+                return response.status(200).json({
+                    message:account_updated
+                })
+            })
+
+
+        }
+        else{
+            return response.status(200).json({
+                message:'user not found'
+            })
+        }
+    })
+    .catch(err =>{
+        return response.status(500).json({
+            message: err
+         });
+    })
+});
+
 
 
 
