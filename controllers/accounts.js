@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const bcryptjs = require('bcryptjs'); 
 const jwt = require('jsonwebtoken');
+const isAuth = require('./isAuth');
 
 //models
 const User = require('../models/user');
@@ -279,7 +280,11 @@ router.post('/newpassword',async (request,response)=>{
     })
 });
 
-
+router.get('/getUserData',isAuth, async (request,response)=>{
+    return response.status(200).json({
+        message: `Hello ${request.account.firstName}`
+    });
+})
 
 
 
