@@ -9,6 +9,9 @@ app.use(bodyParser.json());
 const accountsRoute = require('./controllers/accounts');
 app.use('/api/accounts',accountsRoute);
 
+const storeRoute = require('./controllers/store');
+app.use('/api/accounts',storeRoute);
+
 const port = 5090;
 
 const url = 'mongodb+srv://kiosk_user:123@cluster0.ormat.mongodb.net/kiosk_db?retryWrites=true&w=majority';
