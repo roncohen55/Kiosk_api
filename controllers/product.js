@@ -121,16 +121,88 @@ router.get('/getAllCategories',isAuth,async(request,response)=>{
     })
 });
 
-router.post('/addProduct',isAuth,async(request,response)=>{
+router.post('/addProduct/:categoryId',isAuth,async(request,response)=>{
+    const accountId = request.account._id;
+    const store = await Store.findOne({associateId:accountId});
+    const categoryId = request.params.categoryId;
+    const productId = mongoose.Types.ObjectId();
+    const{  productName, imageSource, price,unitInStock,desclimer,isAgelimitid} = request.body;
+    const _product = new Product({
+        _id:productId,
+        storeId:store._id,
+        categoryId:categoryId,
+        productName:productName,
+        productImages:[
+            {imageSource:imageSource}
+        ],
+        price:price,
+        unitInStock:unitInStock,
+        desclimer:desclimer,
+        isAgelimitid:isAgelimitid
 
+    });
+    return _product.save()
+    .then(product_updated =>{
+        return response.status(200).json({
+            productdata:product_updated
+        });
+    })
+    .catch(err =>{
+        return response.status(500).json({
+            message:err
+        });
+    })
 })
 
-router.put('/updateProduct',isAuth,async(request,response)=>{
-    
+router.put('/updateProduct/:productId',isAuth,async(request,response)=>{
+    const{  productName, imageSource, price,unitInStock,desclimer,isAgelimitid} = request.body;
+    const pid = request.params.productId;
+    Product.findById(pid)
+    .then(product=>{
+        if(product){
+            product.productName=productName,
+            product.imageSource=imageSource,
+           product.price=price,
+           product.unitInStock = unitInStock,
+           product.desclimer= desclimer,
+           product.isAgelimitid = isAgelimitid
+           return product.save()
+           .then(product_updated =>{
+            return response.status(200).json({
+                productdata:product_updated
+            });
+        })
+
+        }
+        else{
+            return response.status(200).json({
+                status:false,
+                message:'product not found!'
+            })
+        }
+    })
+    .catch(error =>{
+        return response.status(500).json({
+            message:error
+        });
+    })
 })
 
-router.delete('/deleteProduct',isAuth,async(request,response)=>{
-    
+router.delete('/deleteProduct/:productId',isAuth,async(request,response)=>{
+    const pid = request.params.productId;
+    Product.findByIdAndDelete(Pid)
+    .then(product_delete =>{
+        return response.status(200).json({
+            status:true,
+            message:product_delete
+        })
+    })
+    .catch(err=>{
+        return response.status(500).json({
+            status:false,
+            message:err
+        });
+    })  
 })
 
 router.get('/getProductByCategoryId/:categoryId',isAuth,async(request,response)=>{
@@ -151,5 +223,22 @@ router.get('/getProductByCategoryId/:categoryId',isAuth,async(request,response)=
         });
     })
 })
+router.get('/getProduct/:productId',isAuth,async(request,response)=>{
+    const accountId = request.account._id;
+    const pid = request.params.productId;
+   Product.findById(pid)
+    .then(products => {
+        return response.status(200).json({
+            status:true,
+            message:products
+        });
+    })
+    .catch(err =>{
+        return response.status(500).json({
+            status:false,
+            message:err
+        });
+    })
+});
 
 module.exports = router;

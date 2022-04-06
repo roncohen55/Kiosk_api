@@ -13,7 +13,7 @@ const  productSchema = new Schema({
        }
    ],
    price:Number,
-
+   desclimer:String,
    discount:{type:Number,default:0},
    unitInStock:Number,
    isAgelimitid:Boolean
