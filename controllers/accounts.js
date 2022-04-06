@@ -10,6 +10,8 @@ const isAuth = require('./isAuth');
 const User = require('../models/user');
 const { request, response } = require('express');
 const Store = require('../models/store');
+const Category = require('../models/category');
+const Product = require('../models/product');
 
 //createAcount
 router.post('/createAccount', async (request,response) =>{
@@ -284,9 +286,29 @@ router.post('/newpassword',async (request,response)=>{
 router.get('/getUserData',isAuth, async (request,response)=>{
     const id = request.account._id;
     const store = await Store.findOne({associateId:id}).populate('associateId');
+    const products = await Product.find({storeId:store._id});
+    const categories = await Category.find({storeId:store._id});
+
+    let allProducts = [
+
+    ];
+
+    categories.forEach(category=>{
+        let catProducts = [];
+        products.forEach(y => {
+            if(category._id.equals(y.categoryId))
+            {
+                catProducts.push(y);
+            }
+        })
+        allProducts.push({category, catProducts});
+    })
+
+
     return response.status(200).json({
-        //message: `Hello ${request.account.firstName}`,
-        data:store
+        dataStore:store,
+        dataCategory:allProducts
+        
     });
 })
 

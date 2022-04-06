@@ -155,17 +155,20 @@ router.post('/addProduct/:categoryId',isAuth,async(request,response)=>{
 })
 
 router.put('/updateProduct/:productId',isAuth,async(request,response)=>{
-    const{  productName, imageSource, price,unitInStock,desclimer,isAgelimitid} = request.body;
+    const{  productName, imageSource, price,unitInStock,desclimer,isAgelimitid,discount} = request.body;
     const pid = request.params.productId;
     Product.findById(pid)
     .then(product=>{
         if(product){
-            product.productName=productName,
-            product.imageSource=imageSource,
-           product.price=price,
+            if(imageSource != ''){
+            product.productImages.push({ imageSource:imageSource});
+            }
+            product.productName = productName,
+           product.price = price,
            product.unitInStock = unitInStock,
-           product.desclimer= desclimer,
-           product.isAgelimitid = isAgelimitid
+           product.desclimer = desclimer,
+           product.isAgelimitid = isAgelimitid,
+           product.discount = discount
            return product.save()
            .then(product_updated =>{
             return response.status(200).json({
